@@ -1,0 +1,15 @@
+{
+  "name": "bandcamp_extract_links_tool",
+  "version": "1.0.0",
+  "description": "Extracts links and embeds from bandcamp track pages for easy includes in a blog",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3"
+  }
+}
