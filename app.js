@@ -5,6 +5,8 @@ const fs = require('fs')
 const { exec } = require('child_process')
 
 const FILES_OUTPUT_FOLDER = `generated`
+const frontMatter = (date) =>
+  `---\ntitle:\ndate: '${date}'\ncategory: weekly\nfeaturedImgUrl:\nfeaturedImgAlt:\n---`
 
 /* Get command-line args */
 let headingTitleA = process.argv[2]
@@ -101,6 +103,7 @@ const run = async () => {
     )
   }
 
+  /* Open write stream */
   var writeStream = fs.createWriteStream(
     `${FILES_OUTPUT_FOLDER}/markdown/generated.md`,
     {
@@ -108,6 +111,11 @@ const run = async () => {
     }
   )
 
+  /* Write frontmatter */
+  const currentDate = new Date().toISOString().substring(0, 10)
+  writeStream.write(`${frontMatter(currentDate)}\n\n`)
+
+  /* -- Write body -- */
   writeStream.write(`# ${headingTitleA}  \n`)
   for (let i = 0; i < trackLinks.length; i++) {
     writeStream.write(`${i + 1}. ${trackLinks[i]}` + '  \n')
@@ -118,7 +126,9 @@ const run = async () => {
   for (let i = 0; i < embedPlayers.length; i++) {
     writeStream.write(embedPlayers[i] + '  \n')
   }
+  /* -- finished writing body -- */
 
+  /* Download images */
   for (let i = 0; i < imageUrls.length; i++) {
     let url = imageUrls[i]
     let dest = `${FILES_OUTPUT_FOLDER}/images`
