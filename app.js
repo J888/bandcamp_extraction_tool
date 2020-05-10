@@ -29,15 +29,15 @@ const embedPlayer = (
   artistName,
   trackName
 ) => {
-
   if (albumId) {
     return (
       `<iframe style="border: 0; width: 100%; height: 42px;" ` +
       `src="https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=small/bgcol=ffffff/linkcol=0687f5/track=${trackId}/transparent=true/" ` +
       `seamless><a href="${albumPathFull}">${albumName} by ${artistName}</a></iframe>`
     )
-  } else { // if this track has no parent album
-    return(
+  } else {
+    // if this track has no parent album
+    return (
       `<iframe style="border: 0; width: 100%; height: 42px;" ` +
       `src="https://bandcamp.com/EmbeddedPlayer/track=${trackId}/size=small/bgcol=ffffff/linkcol=0687f5/transparent=true/" ` +
       `seamless><a href="${albumPathFull}">${trackName} by ${artistName}</a></iframe>`
@@ -55,7 +55,9 @@ const extractDataFromPage = async (url) => {
   const parsedTrackData = JSON.parse($('#pagedata')[0].attribs['data-blob'])
   const { album_id: albumId, track_id: trackId } = parsedTrackData
 
-  const albumPathFull = $('meta[property="og:url"]').attr('content').replace('https', 'http')
+  const albumPathFull = $('meta[property="og:url"]')
+    .attr('content')
+    .replace('https', 'http')
   const albumName = $('.fromAlbum').text()
   const artistName = $('span[itemprop=byArtist]').find('a').text()
 
@@ -107,7 +109,14 @@ const run = async () => {
     trackLinks.push(trackLink(artistName, trackName, url))
 
     embedPlayers.push(
-      embedPlayer(albumId, trackId, albumPathFull, albumName, artistName, trackName)
+      embedPlayer(
+        albumId,
+        trackId,
+        albumPathFull,
+        albumName,
+        artistName,
+        trackName
+      )
     )
   }
 
