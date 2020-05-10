@@ -21,18 +21,28 @@ process.argv.forEach((arg, i) => {
 /* Return the iframe html string for a (small sized) bandcamp track player.
    Example: <iframe style="border: 0; width: 100%; height: 42px;" src="https://bandcamp.com/EmbeddedPlayer/album=3214757306/size=small/bgcol=ffffff/linkcol=0687f5/track=2295968844/transparent=true/" seamless><a href="http://pezzettino.bandcamp.com/album/venus">Venus by Pezzettino</a></iframe>
 */
-const embedPlayer = async (
+const embedPlayer = (
   albumId,
   trackId,
   albumPathFull,
   albumName,
-  artistName
+  artistName,
+  trackName
 ) => {
-  return (
-    `<iframe style="border: 0; width: 100%; height: 42px;" ` +
-    `src="https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=small/bgcol=ffffff/linkcol=0687f5/track=${trackId}/transparent=true/" ` +
-    `seamless><a href="${albumPathFull}">${albumName} by ${artistName}</a></iframe>`
-  )
+
+  if (albumId) {
+    return (
+      `<iframe style="border: 0; width: 100%; height: 42px;" ` +
+      `src="https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=small/bgcol=ffffff/linkcol=0687f5/track=${trackId}/transparent=true/" ` +
+      `seamless><a href="${albumPathFull}">${albumName} by ${artistName}</a></iframe>`
+    )
+  } else { // if this track has no parent album
+    return(
+      `<iframe style="border: 0; width: 100%; height: 42px;" ` +
+      `src="https://bandcamp.com/EmbeddedPlayer/track=${trackId}/size=small/bgcol=ffffff/linkcol=0687f5/transparent=true/" ` +
+      `seamless><a href="${albumPathFull}">${trackName} by ${artistName}</a></iframe>`
+    )
+  }
 }
 
 /* Return the extracted info from the page as an array */
@@ -45,9 +55,7 @@ const extractDataFromPage = async (url) => {
   const parsedTrackData = JSON.parse($('#pagedata')[0].attribs['data-blob'])
   const { album_id: albumId, track_id: trackId } = parsedTrackData
 
-  const albumBase = url.match(/https?:\/\/[!-z]+.com/)[0]
-  const albumPath = $('.buyAlbumLink').find('a#buyAlbumLink').attr('href')
-  const albumPathFull = (albumBase + albumPath).replace('https', 'http')
+  const albumPathFull = $('meta[property="og:url"]').attr('content').replace('https', 'http')
   const albumName = $('.fromAlbum').text()
   const artistName = $('span[itemprop=byArtist]').find('a').text()
 
@@ -99,7 +107,7 @@ const run = async () => {
     trackLinks.push(trackLink(artistName, trackName, url))
 
     embedPlayers.push(
-      await embedPlayer(albumId, trackId, albumPathFull, albumName, artistName)
+      embedPlayer(albumId, trackId, albumPathFull, albumName, artistName, trackName)
     )
   }
 
